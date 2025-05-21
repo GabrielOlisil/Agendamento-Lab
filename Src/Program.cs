@@ -1,12 +1,15 @@
 using Agendamentos.Database;
 using Agendamentos.Endpoints;
 using Agendamentos.Domain.Models;
+using Agendamentos.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<AgendamentosDbContext>();
+builder.Services.AddScoped<AgendamentoHelper>();
+
 
 builder.Services.AddSwaggerGen();
 
@@ -44,8 +47,14 @@ ambientes.MapPost("/", AmbientesEndpoints.CriarAmbiente);
 
 var calendario = app.MapGroup("/calendario");
 
-calendario.MapGet("/dia/{dia}", CalendarioEndpoints.AgendamentosDia);
+calendario.MapGet("/{slug}/dia/{dia:datetime}", CalendarioEndpoints.AgendamentosDia);
+calendario.MapGet("/{slug}/semana/{dia:datetime}", CalendarioEndpoints.AgendamentosSemana);
 
+
+var professores = app.MapGroup("professores");
+
+professores.MapPost("/", ProfessoresEndpoints.CreateProfessor);
+professores.MapGet("/", ProfessoresEndpoints.ListarProfessores);
 
 app.Run();
 

@@ -13,7 +13,7 @@ public class AmbientesEndpoints
         return TypedResults.Ok(ambientes);
     }
 
-    public static async Task<IResult> CriarAmbiente(AgendamentosDbContext dbContext, AmbienteCreateDto ambiente)
+    public static async Task<IResult> CriarAmbiente(AgendamentosDbContext dbContext, AmbienteCreateDto ambiente, ILogger<AmbientesEndpoints> logger)
     {
         if (string.IsNullOrWhiteSpace(ambiente.Nome))
         {
@@ -26,6 +26,9 @@ public class AmbientesEndpoints
             Id = Guid.NewGuid(),
             Nome = ambiente.Nome,
         };
+        
+        ambienteNovo.SetSlug(ambienteNovo.Nome);
+        
 
         dbContext.Ambientes.Add(ambienteNovo);
         await dbContext.SaveChangesAsync();

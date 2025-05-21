@@ -1,6 +1,7 @@
 using Agendamentos.Database;
 using Agendamentos.Domain.DTOs;
 using Agendamentos.Domain.Models;
+using Agendamentos.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Agendamentos.Endpoints;
@@ -25,17 +26,22 @@ public class AgendamentoEndpoints()
         
         var ambiente = await dbContext.Ambientes.FindAsync(agendamento.AmbienteId);
         var horario = await dbContext.Horarios.FindAsync(agendamento.HorarioId);
+        var professor = await dbContext.Professores.FindAsync(agendamento.ProfessorId);
         
-        if (ambiente is null || horario is null)
+        if (ambiente is null || horario is null || professor is null)
             return TypedResults.BadRequest("Ambiente ou horário inválido.");
+
+
         
         var novoAgendamento = new Agendamento()
         {
             Ambiente = ambiente,
             Data = agendamento.Data,
             Horario = horario,
+            Professor = professor,
             Id = Guid.NewGuid()
         };
+        
 
         dbContext.Agendamentos.Add(novoAgendamento);
 

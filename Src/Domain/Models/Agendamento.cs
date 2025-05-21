@@ -5,9 +5,11 @@ public class Agendamento
 {
     public Guid Id { get; init; }
 
-    public Ambiente Ambiente { get; set; } = null!;
+    public Ambiente Ambiente { get; set; }
 
     public DateTime Data { get; set; }
 
-    public Horario Horario { get; set; } = null!;
+    public Horario Horario { get; set; }
+
+    public Professor Professor { get; set; }
 }

@@ -9,4 +9,5 @@ public record AgendamentoCreateDto
     public DateTime Data { get; set; }
 
     public Guid HorarioId { get; set; }
+    public Guid ProfessorId { get; set; }
 }

@@ -37,11 +37,16 @@ namespace Agendamentos.Migrations
                     b.Property<Guid>("HorarioId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("ProfessorId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AmbienteId");
 
                     b.HasIndex("HorarioId");
+
+                    b.HasIndex("ProfessorId");
 
                     b.ToTable("Agendamentos");
                 });
@@ -56,7 +61,14 @@ namespace Agendamentos.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
 
                     b.ToTable("Ambientes");
                 });
@@ -108,7 +120,93 @@ namespace Agendamentos.Migrations
                             Inicio = new TimeSpan(0, 11, 0, 0, 0),
                             Rank = 4,
                             Turno = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("55555555-5555-5555-5555-555555555555"),
+                            Inicio = new TimeSpan(0, 11, 0, 0, 0),
+                            Rank = 5,
+                            Turno = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("66666666-6666-6666-6666-666666666666"),
+                            Inicio = new TimeSpan(0, 11, 0, 0, 0),
+                            Rank = 6,
+                            Turno = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("77777777-7777-7777-7777-777777777777"),
+                            Inicio = new TimeSpan(0, 11, 0, 0, 0),
+                            Rank = 7,
+                            Turno = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-888888888888"),
+                            Inicio = new TimeSpan(0, 11, 0, 0, 0),
+                            Rank = 8,
+                            Turno = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("99999999-9999-9999-9999-999999999999"),
+                            Inicio = new TimeSpan(0, 11, 0, 0, 0),
+                            Rank = 9,
+                            Turno = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("10101010-1010-1010-1010-101010101010"),
+                            Inicio = new TimeSpan(0, 11, 0, 0, 0),
+                            Rank = 10,
+                            Turno = 2
+                        },
+                        new
+                        {
+                            Id = new Guid("11011011-1101-1101-1101-110110110110"),
+                            Inicio = new TimeSpan(0, 11, 0, 0, 0),
+                            Rank = 11,
+                            Turno = 2
+                        },
+                        new
+                        {
+                            Id = new Guid("12121212-1212-1212-1212-121212121212"),
+                            Inicio = new TimeSpan(0, 11, 0, 0, 0),
+                            Rank = 12,
+                            Turno = 2
+                        },
+                        new
+                        {
+                            Id = new Guid("13131313-1313-1313-1313-131313131313"),
+                            Inicio = new TimeSpan(0, 11, 0, 0, 0),
+                            Rank = 13,
+                            Turno = 2
                         });
+                });
+
+            modelBuilder.Entity("Agendamentos.Domain.Models.Professor", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Matricula")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Professores");
                 });
 
             modelBuilder.Entity("Agendamentos.Domain.Models.Agendamento", b =>
@@ -125,9 +223,17 @@ namespace Agendamentos.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Agendamentos.Domain.Models.Professor", "Professor")
+                        .WithMany()
+                        .HasForeignKey("ProfessorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Ambiente");
 
                     b.Navigation("Horario");
+
+                    b.Navigation("Professor");
                 });
 #pragma warning restore 612, 618
         }

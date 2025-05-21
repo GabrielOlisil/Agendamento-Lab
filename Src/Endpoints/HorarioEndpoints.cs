@@ -8,6 +8,6 @@ public class HorarioEndpoints
 {
     public static async Task<IResult> ListarHorarios(AgendamentosDbContext dbContext)
     {
-        return TypedResults.Ok( await dbContext.Horarios.ToListAsync());
+        return TypedResults.Ok( await dbContext.Horarios.OrderBy(p => p.Rank).ToListAsync());
     }
 }
