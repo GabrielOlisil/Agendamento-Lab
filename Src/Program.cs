@@ -1,41 +1,52 @@
+using Agendamentos.Database;
+using Agendamentos.Endpoints;
+using Agendamentos.Domain.Models;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddDbContext<AgendamentosDbContext>();
+
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+var agendamentos = app.MapGroup("/agendamentos");
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+agendamentos.MapGet("/", AgendamentoEndpoints.ListAgendamento)
+    .WithName("Agendar Aula")
+    .WithOpenApi();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+agendamentos.MapPost("/", AgendamentoEndpoints.CreateAgendamento);
+
+
+
+var horarios = app.MapGroup("/horarios");
+
+horarios.MapGet("/", HorarioEndpoints.ListarHorarios).WithName("Listar Horarios")
+    .WithSummary("Lista todos os horarios")
+    .WithOpenApi();
+
+
+var ambientes = app.MapGroup("/ambientes");
+
+ambientes.MapGet("/", AmbientesEndpoints.ListarAmbientes);
+ambientes.MapPost("/", AmbientesEndpoints.CriarAmbiente);
+
+
+var calendario = app.MapGroup("/calendario");
+
+calendario.MapGet("/dia/{dia}", CalendarioEndpoints.AgendamentosDia);
+
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+
