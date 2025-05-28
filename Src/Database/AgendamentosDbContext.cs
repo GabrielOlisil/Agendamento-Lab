@@ -8,6 +8,8 @@ public class AgendamentosDbContext : DbContext
     public DbSet<Agendamento> Agendamentos { get; set; } = null!;
     public DbSet<Ambiente> Ambientes { get; set; }
     public DbSet<Horario> Horarios { get; set; }
+    
+    public DbSet<User> Users { get; set; }
 
     public DbSet<Professor> Professores { get; set; }
 
@@ -16,12 +18,18 @@ public class AgendamentosDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        
+        
         modelBuilder.Entity<Agendamento>(e => e.Property(p => p.Data)
             .HasColumnType("date"));
 
 
         modelBuilder.Entity<Ambiente>()
             .HasIndex(p => p.Slug)
+            .IsUnique();
+        
+        modelBuilder.Entity<User>()
+            .HasIndex(p => p.UserName)
             .IsUnique();
 
         modelBuilder.Entity<Horario>().HasData(

@@ -6,12 +6,20 @@ public class Professor
 {
     public Guid Id { get; set; }
     public string Nome { get; set; }
-    public string Slug { get; private set; }
+    public string Slug { get;  set; }
 
     public string Matricula { get; set; }
-
-    public void SetSlug(string value)
+    
+    public Professor()
     {
-        Slug = SlugService.Generate(value);
+        
+    }
+
+    public Professor(Guid id, string nome, string matricula,string slug)
+    {
+        Id = id;
+        Nome = nome;
+        Matricula = matricula;
+        Slug = SlugService.Generate(slug);
     }
 }

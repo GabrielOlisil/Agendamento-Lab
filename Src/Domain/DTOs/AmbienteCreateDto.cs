@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Agendamentos.Domain.DTOs;
 
 public record AmbienteCreateDto
 {
-    public string Nome { get; init; }
+    [Required]
+    public required string Nome { get; init; }
 
 }

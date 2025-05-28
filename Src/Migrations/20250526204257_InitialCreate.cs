@@ -87,6 +87,26 @@ namespace Agendamentos.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserName = table.Column<string>(type: "text", nullable: false),
+                    PassWordHash = table.Column<string>(type: "text", nullable: false),
+                    ProfessorId = table.Column<Guid>(type: "uuid", nullable: true),
+                    Role = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_Professores_ProfessorId",
+                        column: x => x.ProfessorId,
+                        principalTable: "Professores",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.InsertData(
                 table: "Horarios",
                 columns: new[] { "Id", "Inicio", "Rank", "Turno" },
@@ -127,6 +147,17 @@ namespace Agendamentos.Migrations
                 table: "Ambientes",
                 column: "Slug",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_ProfessorId",
+                table: "Users",
+                column: "ProfessorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_UserName",
+                table: "Users",
+                column: "UserName",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -134,6 +165,9 @@ namespace Agendamentos.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Agendamentos");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Ambientes");

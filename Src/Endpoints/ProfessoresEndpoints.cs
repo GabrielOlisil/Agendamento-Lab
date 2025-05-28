@@ -2,6 +2,8 @@ using Agendamentos.Database;
 using Agendamentos.Domain.DTOs;
 using Agendamentos.Domain.Models;
 using Agendamentos.Helpers;
+using Agendamentos.Repositories;
+using Agendamentos.Repositories.Interfaces;
 using Agendamentos.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,35 +12,36 @@ namespace Agendamentos.Endpoints;
 public class ProfessoresEndpoints
 {
     public static async Task<IResult> CreateProfessor(
-        AgendamentosDbContext dbContext, 
-        AgendamentoHelper agHelper, 
-        ProfessorCreateDto professor
-        )
+        AgendamentoHelper agHelper,
+        ProfessorCreateDto professorDto,
+        IApplicationRepository<Professor> professorRepository,
+        ProfessorService professorService
+    )
     {
+        var professor = new Professor(
+            Guid.NewGuid(),
+            professorDto.Nome,
+            professorDto.Matricula,
+            professorDto.Nome);
 
-        var slug = SlugService.Generate(professor.Nome);
-        
-        var professorNovo = new Professor()
+        var professorCriado = await professorService.CreateNewProfessorAndHisUserAsync(professor);
+
+
+        if (professorCriado is null)
         {
-            Id = Guid.NewGuid(),
-            Nome = professor.Nome,
-            Matricula = professor.Matricula,
-        };
-        
-        professorNovo.SetSlug(slug);
+            return TypedResults.BadRequest("Não foi possível criar o professor.");
+        }
 
-        dbContext.Professores.Add(professorNovo);
 
-        await dbContext.SaveChangesAsync();
-
-        return TypedResults.Created($"/professores/{professorNovo.Id}", professorNovo);
-
+        return TypedResults.Created($"/professores/{professorCriado.Id}", professorCriado);
     }
 
-    public static async Task<IResult> ListarProfessores(AgendamentosDbContext dbContext)
+    public static async Task<IResult> ListarProfessores(
+        IApplicationRepository<Professor> professorRepository
+    )
     {
-        var professores = await dbContext.Professores.ToListAsync();
-        
+        var professores = await professorRepository.GetAll();
+
         return TypedResults.Ok(professores);
     }
 }

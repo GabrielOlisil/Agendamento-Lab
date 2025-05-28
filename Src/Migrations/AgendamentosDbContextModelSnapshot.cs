@@ -209,6 +209,37 @@ namespace Agendamentos.Migrations
                     b.ToTable("Professores");
                 });
 
+            modelBuilder.Entity("Agendamentos.Domain.Models.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("PassWordHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("ProfessorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProfessorId");
+
+                    b.HasIndex("UserName")
+                        .IsUnique();
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("Agendamentos.Domain.Models.Agendamento", b =>
                 {
                     b.HasOne("Agendamentos.Domain.Models.Ambiente", "Ambiente")
@@ -232,6 +263,15 @@ namespace Agendamentos.Migrations
                     b.Navigation("Ambiente");
 
                     b.Navigation("Horario");
+
+                    b.Navigation("Professor");
+                });
+
+            modelBuilder.Entity("Agendamentos.Domain.Models.User", b =>
+                {
+                    b.HasOne("Agendamentos.Domain.Models.Professor", "Professor")
+                        .WithMany()
+                        .HasForeignKey("ProfessorId");
 
                     b.Navigation("Professor");
                 });

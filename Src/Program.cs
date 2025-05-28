@@ -2,16 +2,34 @@ using Agendamentos.Database;
 using Agendamentos.Endpoints;
 using Agendamentos.Domain.Models;
 using Agendamentos.Helpers;
+using Agendamentos.Repositories;
+using Agendamentos.Repositories.Interfaces;
+using Agendamentos.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
 builder.Services.AddDbContext<AgendamentosDbContext>();
 builder.Services.AddScoped<AgendamentoHelper>();
+builder.Services.AddScoped<IApplicationRepository<Professor>, ProfessorRepository>();
+builder.Services.AddScoped<IApplicationRepository<User>, UserRepository>();
+builder.Services.AddScoped<ProfessorService>();
+builder.Services.AddScoped<UserService>();
 
 
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(jwtOptions =>
+    {
+        jwtOptions.Authority = "https://localhost:8080";
+        jwtOptions.Audience = "https://localhost:8080";
+    });
 
 var app = builder.Build();
 
@@ -55,6 +73,10 @@ var professores = app.MapGroup("professores");
 
 professores.MapPost("/", ProfessoresEndpoints.CreateProfessor);
 professores.MapGet("/", ProfessoresEndpoints.ListarProfessores);
+
+var users = app.MapGroup("users");
+
+users.MapPost("/bootstrap", UserEndpoints.BootstrapUser);
 
 app.Run();
 

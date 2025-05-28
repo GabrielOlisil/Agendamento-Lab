@@ -9,33 +9,34 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
 {
     public async Task<CalendarioDiaResponse> ObterAgendamentosDia(string slug, DateTime dia)
     {
-        var aulas = new CalendarioDiaResponse();
+        var aulas = new CalendarioDiaResponse()
+        {
+            Matutino = [],
+            Noturno = [],
+            Vespertino = []
+        };
         
         var aulasHorario =
             await dbContext.Horarios
                 .OrderBy(p => p.Rank)
                 .ToArrayAsync();
-
         
-        aulas.Matutino = [];
-        aulas.Vespertino = [];
-        aulas.Noturno = [];
 
 
-        foreach (var mat in aulasHorario)
+        foreach (var horario in aulasHorario)
         {
 
-            switch (mat.Turno)
+            switch (horario.Turno)
             {
                 case Turno.Matutino:
-                    aulas.Matutino.Add(new AgendamentoLabelResponse(){Rank = mat.Rank, Label = mat.Rank.ToString(), Status = false});
+                    aulas.Matutino.Add(new AgendamentoLabelResponse(){Rank = horario.Rank, Label = horario.Rank.ToString(), Status = false});
                     break;
                 case Turno.Verspertino:
-                    aulas.Vespertino.Add(new AgendamentoLabelResponse(){Rank = mat.Rank, Label = mat.Rank.ToString(), Status = false});
+                    aulas.Vespertino.Add(new AgendamentoLabelResponse(){Rank = horario.Rank, Label = horario.Rank.ToString(), Status = false});
 
                     break;
                 case Turno.Noturno:
-                    aulas.Noturno.Add(new AgendamentoLabelResponse(){Rank = mat.Rank, Label = mat.Rank.ToString(), Status = false});
+                    aulas.Noturno.Add(new AgendamentoLabelResponse(){Rank = horario.Rank, Label = horario.Rank.ToString(), Status = false});
 
                     break;
             }
@@ -60,24 +61,46 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
         foreach (var ag in agendamentos)
         {
             
-            
-            
             switch (ag.Horario.Turno)
             {
                 case Turno.Matutino:
-                    aulas.Matutino.Find(a => a.Rank == ag.Horario.Rank).Label = ag.Professor.Nome;
-                    aulas.Matutino.Find(a => a.Rank == ag.Horario.Rank).Status = true;
+                    var hor = aulas.Matutino.Find(a => a.Rank == ag.Horario.Rank);
+
+                    if (hor is null)
+                    {
+                        break;
+                    }
+                    
+                    hor.Label = ag.Professor.Nome;
+                    hor.Status = true;
+                    
                     break;
                 
                 case Turno.Verspertino:
-                    aulas.Vespertino.Find(a => a.Rank == ag.Horario.Rank).Label = ag.Professor.Nome;
-                    aulas.Vespertino.Find(a => a.Rank == ag.Horario.Rank).Status = true;
+                    var horVes = aulas.Vespertino.Find(a => a.Rank == ag.Horario.Rank);
+
+                    if (horVes is null)
+                    {
+                        break;
+                    }
+                    
+                    horVes.Label = ag.Professor.Nome;
+                    horVes.Status = true;
                     break;
 
                 case Turno.Noturno:
-                    aulas.Noturno.Find(a => a.Rank == ag.Horario.Rank).Label = ag.Professor.Nome;
-                    aulas.Noturno.Find(a => a.Rank == ag.Horario.Rank).Status = true;
+                    var horNot = aulas.Vespertino.Find(a => a.Rank == ag.Horario.Rank);
+
+                    if (horNot is null)
+                    {
+                        break;
+                    }
+                    
+                    horNot.Label = ag.Professor.Nome;
+                    horNot.Status = true;
                     break;
+                
+
             }
         }
 
