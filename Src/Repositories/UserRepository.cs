@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Agendamentos.Repositories;
 
-public class UserRepository(AgendamentosDbContext context) :IApplicationRepository<User>
+public class UserRepository(AgendamentosDbContext context) :IUserRepository<User>
 {
     public async Task<User?> AddAsync(User entity)
     {
@@ -50,5 +50,13 @@ public class UserRepository(AgendamentosDbContext context) :IApplicationReposito
         
         return count;
 
+    }
+
+    public async Task<User?> FindByUserNameAsync(string usr)
+    {
+        var user = await context.Users
+            .FirstOrDefaultAsync(u => u.UserName == usr);
+
+        return user;
     }
 }

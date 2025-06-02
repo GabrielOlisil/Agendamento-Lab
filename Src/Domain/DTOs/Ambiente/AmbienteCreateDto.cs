@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Agendamentos.Domain.DTOs;
+namespace Agendamentos.Domain.DTOs.Ambiente;
 
 public record AmbienteCreateDto
 {

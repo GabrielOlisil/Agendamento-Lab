@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Agendamentos.Domain.DTOs;
+namespace Agendamentos.Domain.DTOs.ProfessorDto;
 
 public class ProfessorCreateDto
 {

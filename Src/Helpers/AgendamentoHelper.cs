@@ -1,4 +1,7 @@
 using Agendamentos.Database;
+using Agendamentos.Domain.DTOs;
+using Agendamentos.Domain.DTOs.Agendamento;
+using Agendamentos.Domain.DTOs.Calendario;
 using Agendamentos.Domain.Models;
 using Agendamentos.Endpoints;
 using Microsoft.EntityFrameworkCore;
@@ -7,9 +10,9 @@ namespace Agendamentos.Helpers;
 
 public class AgendamentoHelper(AgendamentosDbContext dbContext)
 {
-    public async Task<CalendarioDiaResponse> ObterAgendamentosDia(string slug, DateTime dia)
+    public async Task<CalendarioDiaResponseDto> ObterAgendamentosDia(string slug, DateTime dia)
     {
-        var aulas = new CalendarioDiaResponse()
+        var aulas = new CalendarioDiaResponseDto()
         {
             Matutino = [],
             Noturno = [],
@@ -29,14 +32,14 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
             switch (horario.Turno)
             {
                 case Turno.Matutino:
-                    aulas.Matutino.Add(new AgendamentoLabelResponse(){Rank = horario.Rank, Label = horario.Rank.ToString(), Status = false});
+                    aulas.Matutino.Add(new AgendamentoLabelResponseDto(){Rank = horario.Rank, Label = horario.Rank.ToString(), Status = false});
                     break;
                 case Turno.Verspertino:
-                    aulas.Vespertino.Add(new AgendamentoLabelResponse(){Rank = horario.Rank, Label = horario.Rank.ToString(), Status = false});
+                    aulas.Vespertino.Add(new AgendamentoLabelResponseDto(){Rank = horario.Rank, Label = horario.Rank.ToString(), Status = false});
 
                     break;
                 case Turno.Noturno:
-                    aulas.Noturno.Add(new AgendamentoLabelResponse(){Rank = horario.Rank, Label = horario.Rank.ToString(), Status = false});
+                    aulas.Noturno.Add(new AgendamentoLabelResponseDto(){Rank = horario.Rank, Label = horario.Rank.ToString(), Status = false});
 
                     break;
             }

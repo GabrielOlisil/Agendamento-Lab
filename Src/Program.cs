@@ -1,3 +1,4 @@
+using System.Text;
 using Agendamentos.Database;
 using Agendamentos.Endpoints;
 using Agendamentos.Domain.Models;
@@ -8,6 +9,7 @@ using Agendamentos.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,18 +19,63 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddDbContext<AgendamentosDbContext>();
 builder.Services.AddScoped<AgendamentoHelper>();
 builder.Services.AddScoped<IApplicationRepository<Professor>, ProfessorRepository>();
-builder.Services.AddScoped<IApplicationRepository<User>, UserRepository>();
+builder.Services.AddScoped<IUserRepository<User>, UserRepository>();
 builder.Services.AddScoped<ProfessorService>();
 builder.Services.AddScoped<UserService>();
 
+builder.Services.AddAuthentication();
+builder.Services.AddAuthorization();
+builder.Services.AddControllers();
 
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Insira o token JWT no formato: **&lt;seu_token&gt;**"
+    });
+
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(jwtOptions =>
     {
-        jwtOptions.Authority = "https://localhost:8080";
-        jwtOptions.Audience = "https://localhost:8080";
+        jwtOptions.Authority = "http://localhost:8080";
+        jwtOptions.Audience = "http://localhost:8080";
+        jwtOptions.RequireHttpsMetadata = false;
+        jwtOptions.TokenValidationParameters = new TokenValidationParameters
+        {
+            
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            ValidIssuer = "http://localhost:8080",
+            ValidAudience = "http://localhost:8080",
+            IssuerSigningKey = new SymmetricSecurityKey(
+                "iqpevJwhnhFpuAqW0uSRliSrDNpXKEUm2Y1Qc0fq/yY="u8.ToArray()
+            )
+        };
     });
 
 var app = builder.Build();
@@ -40,43 +87,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-var agendamentos = app.MapGroup("/agendamentos");
+app.UseAuthentication();
+app.UseAuthorization();
 
-agendamentos.MapGet("/", AgendamentoEndpoints.ListAgendamento)
-    .WithName("Agendar Aula")
-    .WithOpenApi();
-
-agendamentos.MapPost("/", AgendamentoEndpoints.CreateAgendamento);
-
-
-
-var horarios = app.MapGroup("/horarios");
-
-horarios.MapGet("/", HorarioEndpoints.ListarHorarios).WithName("Listar Horarios")
-    .WithSummary("Lista todos os horarios")
-    .WithOpenApi();
-
-
-var ambientes = app.MapGroup("/ambientes");
-
-ambientes.MapGet("/", AmbientesEndpoints.ListarAmbientes);
-ambientes.MapPost("/", AmbientesEndpoints.CriarAmbiente);
-
-
-var calendario = app.MapGroup("/calendario");
-
-calendario.MapGet("/{slug}/dia/{dia:datetime}", CalendarioEndpoints.AgendamentosDia);
-calendario.MapGet("/{slug}/semana/{dia:datetime}", CalendarioEndpoints.AgendamentosSemana);
-
-
-var professores = app.MapGroup("professores");
-
-professores.MapPost("/", ProfessoresEndpoints.CreateProfessor);
-professores.MapGet("/", ProfessoresEndpoints.ListarProfessores);
-
-var users = app.MapGroup("users");
-
-users.MapPost("/bootstrap", UserEndpoints.BootstrapUser);
+app.MapControllers();
 
 app.Run();
 

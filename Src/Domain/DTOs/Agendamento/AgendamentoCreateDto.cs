@@ -1,6 +1,6 @@
 using Agendamentos.Domain.Models;
 
-namespace Agendamentos.Domain.DTOs;
+namespace Agendamentos.Domain.DTOs.Agendamento;
 
 public record AgendamentoCreateDto
 {

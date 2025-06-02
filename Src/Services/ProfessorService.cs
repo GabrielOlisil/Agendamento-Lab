@@ -1,5 +1,6 @@
 using Agendamentos.Database;
 using Agendamentos.Domain.DTOs;
+using Agendamentos.Domain.DTOs.User;
 using Agendamentos.Domain.Models;
 using Agendamentos.Repositories.Interfaces;
 using InvalidOperationException = System.InvalidOperationException;
@@ -9,7 +10,7 @@ namespace Agendamentos.Services;
 public class ProfessorService(
     AgendamentosDbContext context,
     IApplicationRepository<Professor> professorRepository,
-    IApplicationRepository<User> userRepository,
+    IUserRepository<User> userRepository,
     UserService userService
 )
 {
