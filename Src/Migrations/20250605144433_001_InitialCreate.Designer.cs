@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Agendamentos.Migrations
 {
     [DbContext(typeof(AgendamentosDbContext))]
-    [Migration("20250526204257_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250605144433_001_InitialCreate")]
+    partial class _001_InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,6 +36,9 @@ namespace Agendamentos.Migrations
 
                     b.Property<DateTime>("Data")
                         .HasColumnType("date");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("HorarioId")
                         .HasColumnType("uuid");
@@ -60,6 +63,9 @@ namespace Agendamentos.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("text");
@@ -82,6 +88,9 @@ namespace Agendamentos.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("boolean");
+
                     b.Property<TimeSpan>("Inicio")
                         .HasColumnType("interval");
 
@@ -99,6 +108,7 @@ namespace Agendamentos.Migrations
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            Deleted = false,
                             Inicio = new TimeSpan(0, 8, 0, 0, 0),
                             Rank = 1,
                             Turno = 0
@@ -106,6 +116,7 @@ namespace Agendamentos.Migrations
                         new
                         {
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Deleted = false,
                             Inicio = new TimeSpan(0, 9, 0, 0, 0),
                             Rank = 2,
                             Turno = 0
@@ -113,6 +124,7 @@ namespace Agendamentos.Migrations
                         new
                         {
                             Id = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Deleted = false,
                             Inicio = new TimeSpan(0, 10, 0, 0, 0),
                             Rank = 3,
                             Turno = 0
@@ -120,6 +132,7 @@ namespace Agendamentos.Migrations
                         new
                         {
                             Id = new Guid("44444444-4444-4444-4444-444444444444"),
+                            Deleted = false,
                             Inicio = new TimeSpan(0, 11, 0, 0, 0),
                             Rank = 4,
                             Turno = 0
@@ -127,6 +140,7 @@ namespace Agendamentos.Migrations
                         new
                         {
                             Id = new Guid("55555555-5555-5555-5555-555555555555"),
+                            Deleted = false,
                             Inicio = new TimeSpan(0, 11, 0, 0, 0),
                             Rank = 5,
                             Turno = 1
@@ -134,6 +148,7 @@ namespace Agendamentos.Migrations
                         new
                         {
                             Id = new Guid("66666666-6666-6666-6666-666666666666"),
+                            Deleted = false,
                             Inicio = new TimeSpan(0, 11, 0, 0, 0),
                             Rank = 6,
                             Turno = 1
@@ -141,6 +156,7 @@ namespace Agendamentos.Migrations
                         new
                         {
                             Id = new Guid("77777777-7777-7777-7777-777777777777"),
+                            Deleted = false,
                             Inicio = new TimeSpan(0, 11, 0, 0, 0),
                             Rank = 7,
                             Turno = 1
@@ -148,6 +164,7 @@ namespace Agendamentos.Migrations
                         new
                         {
                             Id = new Guid("88888888-8888-8888-8888-888888888888"),
+                            Deleted = false,
                             Inicio = new TimeSpan(0, 11, 0, 0, 0),
                             Rank = 8,
                             Turno = 1
@@ -155,6 +172,7 @@ namespace Agendamentos.Migrations
                         new
                         {
                             Id = new Guid("99999999-9999-9999-9999-999999999999"),
+                            Deleted = false,
                             Inicio = new TimeSpan(0, 11, 0, 0, 0),
                             Rank = 9,
                             Turno = 1
@@ -162,6 +180,7 @@ namespace Agendamentos.Migrations
                         new
                         {
                             Id = new Guid("10101010-1010-1010-1010-101010101010"),
+                            Deleted = false,
                             Inicio = new TimeSpan(0, 11, 0, 0, 0),
                             Rank = 10,
                             Turno = 2
@@ -169,6 +188,7 @@ namespace Agendamentos.Migrations
                         new
                         {
                             Id = new Guid("11011011-1101-1101-1101-110110110110"),
+                            Deleted = false,
                             Inicio = new TimeSpan(0, 11, 0, 0, 0),
                             Rank = 11,
                             Turno = 2
@@ -176,6 +196,7 @@ namespace Agendamentos.Migrations
                         new
                         {
                             Id = new Guid("12121212-1212-1212-1212-121212121212"),
+                            Deleted = false,
                             Inicio = new TimeSpan(0, 11, 0, 0, 0),
                             Rank = 12,
                             Turno = 2
@@ -183,6 +204,7 @@ namespace Agendamentos.Migrations
                         new
                         {
                             Id = new Guid("13131313-1313-1313-1313-131313131313"),
+                            Deleted = false,
                             Inicio = new TimeSpan(0, 11, 0, 0, 0),
                             Rank = 13,
                             Turno = 2
@@ -194,6 +216,9 @@ namespace Agendamentos.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Matricula")
                         .IsRequired()
@@ -217,6 +242,9 @@ namespace Agendamentos.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("PassWordHash")
                         .IsRequired()

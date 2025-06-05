@@ -3,7 +3,6 @@ using Agendamentos.Domain.DTOs;
 using Agendamentos.Domain.DTOs.Agendamento;
 using Agendamentos.Domain.DTOs.Calendario;
 using Agendamentos.Domain.Models;
-using Agendamentos.Endpoints;
 using Microsoft.EntityFrameworkCore;
 
 namespace Agendamentos.Helpers;
@@ -18,12 +17,12 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
             Noturno = [],
             Vespertino = []
         };
-        
+
         var aulasHorario =
             await dbContext.Horarios
                 .OrderBy(p => p.Rank)
                 .ToArrayAsync();
-        
+
 
 
         foreach (var horario in aulasHorario)
@@ -32,19 +31,19 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
             switch (horario.Turno)
             {
                 case Turno.Matutino:
-                    aulas.Matutino.Add(new AgendamentoLabelResponseDto(){Rank = horario.Rank, Label = horario.Rank.ToString(), Status = false});
+                    aulas.Matutino.Add(new AgendamentoLabelResponseDto() { Rank = horario.Rank, Label = horario.Rank.ToString(), Status = false });
                     break;
                 case Turno.Verspertino:
-                    aulas.Vespertino.Add(new AgendamentoLabelResponseDto(){Rank = horario.Rank, Label = horario.Rank.ToString(), Status = false});
+                    aulas.Vespertino.Add(new AgendamentoLabelResponseDto() { Rank = horario.Rank, Label = horario.Rank.ToString(), Status = false });
 
                     break;
                 case Turno.Noturno:
-                    aulas.Noturno.Add(new AgendamentoLabelResponseDto(){Rank = horario.Rank, Label = horario.Rank.ToString(), Status = false});
+                    aulas.Noturno.Add(new AgendamentoLabelResponseDto() { Rank = horario.Rank, Label = horario.Rank.ToString(), Status = false });
 
                     break;
             }
         }
-        
+
 
         var agendamentos = await dbContext.Agendamentos
             .Include(e => e.Horario)
@@ -55,15 +54,15 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
             .OrderBy(p => p.Horario.Rank)
             .ToListAsync();
 
-        
-       if (agendamentos.Count == 0)
+
+        if (agendamentos.Count == 0)
         {
             return aulas;
         }
-       
+
         foreach (var ag in agendamentos)
         {
-            
+
             switch (ag.Horario.Turno)
             {
                 case Turno.Matutino:
@@ -73,12 +72,12 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
                     {
                         break;
                     }
-                    
+
                     hor.Label = ag.Professor.Nome;
                     hor.Status = true;
-                    
+
                     break;
-                
+
                 case Turno.Verspertino:
                     var horVes = aulas.Vespertino.Find(a => a.Rank == ag.Horario.Rank);
 
@@ -86,7 +85,7 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
                     {
                         break;
                     }
-                    
+
                     horVes.Label = ag.Professor.Nome;
                     horVes.Status = true;
                     break;
@@ -98,11 +97,11 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
                     {
                         break;
                     }
-                    
+
                     horNot.Label = ag.Professor.Nome;
                     horNot.Status = true;
                     break;
-                
+
 
             }
         }

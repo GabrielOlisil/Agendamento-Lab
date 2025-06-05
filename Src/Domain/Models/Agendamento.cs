@@ -1,10 +1,7 @@
 namespace Agendamentos.Domain.Models;
 
-
-public class Agendamento
+public class Agendamento : AppModelBase
 {
-    public Guid Id { get; init; }
-
     public Ambiente Ambiente { get; set; }
 
     public DateTime Data { get; set; }

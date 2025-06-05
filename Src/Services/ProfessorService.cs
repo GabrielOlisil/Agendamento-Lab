@@ -24,7 +24,7 @@ public class ProfessorService(
             if (professorNovo is null)
             {
                 throw new InvalidOperationException("Não foi possível criar professor");
-                
+
             }
 
             var user = new UserProfessorCreate()
@@ -42,7 +42,7 @@ public class ProfessorService(
             await transaction.CommitAsync();
             return professorNovo;
         }
-        catch 
+        catch
         {
             await transaction.RollbackAsync();
             return null;

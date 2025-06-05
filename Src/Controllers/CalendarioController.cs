@@ -1,6 +1,5 @@
 using Agendamentos.Database;
 using Agendamentos.Domain.DTOs.Calendario;
-using Agendamentos.Endpoints;
 using Agendamentos.Helpers;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,12 +7,12 @@ namespace Agendamentos.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class CalendarioController(AgendamentosDbContext dbContext, AgendamentoHelper agendamentoHelper): ControllerBase
+public class CalendarioController(AgendamentoHelper agendamentoHelper) : ControllerBase
 {
     [HttpGet("{slug}/dia/{dia:datetime}")]
-    public  async Task<IActionResult> AgendamentosDia(string slug, DateTime dia)
+    public async Task<IActionResult> AgendamentosDia(string slug, DateTime dia)
     {
-        
+
         var aulas = await agendamentoHelper.ObterAgendamentosDia(slug, dia);
 
 
@@ -23,21 +22,21 @@ public class CalendarioController(AgendamentosDbContext dbContext, AgendamentoHe
 
 
     [HttpGet("{slug}/semana/{dia:datetime}")]
-    public async Task<IResult> AgendamentosSemana(string slug, DateTime dia)
+    public async Task<IActionResult> AgendamentosSemana(string slug, DateTime dia)
     {
 
         var diferenca = dia.DayOfWeek - DayOfWeek.Sunday;
         DateTime domingo = dia.AddDays(-diferenca);
-        
+
         CalendarioDiaResponseDto[] aulas = new CalendarioDiaResponseDto[7];
-        
+
         for (int i = 0; i < 7; i++)
         {
             var data = domingo.AddDays(i);
             aulas[i] = await agendamentoHelper.ObterAgendamentosDia(slug, data);
         }
-        
-        
-        return TypedResults.Ok(aulas);
+
+
+        return Ok(aulas);
     }
 }

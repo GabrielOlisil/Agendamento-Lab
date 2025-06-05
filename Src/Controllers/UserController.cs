@@ -4,9 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Agendamentos.Controllers;
 
-public class UserController(UserService userService): ControllerBase
+[ApiController]
+[Route("[controller]")]
+public class UserController(UserService userService) : ControllerBase
 {
-    public  async Task<IActionResult> BootstrapUser(UserService userService)
+    [HttpPost("bootstrap")]
+    public async Task<IActionResult> BootstrapUser(UserService userService)
     {
         var createUser = await userService.BootstrapAdminUser();
 
@@ -15,13 +18,21 @@ public class UserController(UserService userService): ControllerBase
             return BadRequest("Não foi possível criar o usuário administrador");
         }
 
-        return Created($"/users/{createUser.user.Id}",createUser.user);
-        
+        return Created($"/users/{createUser.user.Id}", createUser.user);
+
     }
-    
-    public  async Task<IResult> Login( LoginDto userDto)
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginDto userDto)
     {
-        return await userService.Login(userDto);
+        var token = await userService.Login(userDto);
+
+        if (token is null)
+        {
+            return Unauthorized("Usuário ou senha inválidos.");
+        }
+
+        return Ok(new { token });
 
     }
 }

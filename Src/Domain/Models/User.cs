@@ -1,8 +1,7 @@
 namespace Agendamentos.Domain.Models;
 
-public class User
+public class User : AppModelBase
 {
-    public Guid Id { get; set; }
     public string UserName { get; set; }
 
     public string PassWordHash { get; set; }

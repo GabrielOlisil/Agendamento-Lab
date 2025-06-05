@@ -8,11 +8,11 @@ namespace Agendamentos.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class AmbienteController(AgendamentosDbContext dbContext): ControllerBase
+public class AmbienteController(AgendamentosDbContext dbContext) : ControllerBase
 {
-    
+
     [HttpGet]
-    public  async Task<IActionResult> ListarAmbientes()
+    public async Task<IActionResult> ListarAmbientes()
     {
         var ambientes = await dbContext.Ambientes.ToListAsync();
         return Ok(ambientes);
@@ -32,9 +32,9 @@ public class AmbienteController(AgendamentosDbContext dbContext): ControllerBase
             Id = Guid.NewGuid(),
             Nome = ambiente.Nome,
         };
-        
+
         ambienteNovo.SetSlug(ambienteNovo.Nome);
-        
+
 
         dbContext.Ambientes.Add(ambienteNovo);
         await dbContext.SaveChangesAsync();

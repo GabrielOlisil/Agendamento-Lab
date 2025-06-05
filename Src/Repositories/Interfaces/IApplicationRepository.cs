@@ -1,6 +1,6 @@
 namespace Agendamentos.Repositories.Interfaces;
 
-public interface IApplicationRepository<T> where T: class
+public interface IApplicationRepository<T> where T : class
 {
     Task<T?> AddAsync(T entity);
     Task<T?> GetById(Guid id);

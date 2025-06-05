@@ -7,6 +7,6 @@ public class ProfessorCreateDto
     [Required]
     public string Nome { get; set; }
     [Required]
-    public  string Matricula { get; set; }
+    public string Matricula { get; set; }
 
 }

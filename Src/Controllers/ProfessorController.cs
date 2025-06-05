@@ -3,15 +3,20 @@ using Agendamentos.Domain.Models;
 using Agendamentos.Helpers;
 using Agendamentos.Repositories.Interfaces;
 using Agendamentos.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Agendamentos.Controllers;
 
+[ApiController]
+[Route("[controller]")]
+[Authorize(Roles = "admin")]
 public class ProfessorController(
     IApplicationRepository<Professor> professorRepository,
     ProfessorService professorService
 ) : ControllerBase
 {
+    [HttpPost]
     public async Task<IActionResult> CreateProfessor(
         ProfessorCreateDto professorDto
     )
@@ -34,6 +39,8 @@ public class ProfessorController(
         return Created($"/professores/{professorCriado.Id}", professorCriado);
     }
 
+    [HttpGet]
+    [Authorize(Roles = "admin, user")]
     public async Task<IActionResult> ListarProfessores()
     {
         var professores = await professorRepository.GetAll();

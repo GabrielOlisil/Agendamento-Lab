@@ -11,7 +11,7 @@ namespace Agendamentos.Controllers;
 public class AgendamentoController(AgendamentosDbContext dbContext, ILogger<AgendamentoController> logger)
     : ControllerBase
 {
-    
+
     [HttpGet]
     public async Task<IActionResult> ListAgendamento()
     {

@@ -11,6 +11,6 @@ public class HorarioController(AgendamentosDbContext dbContext) : ControllerBase
     [HttpGet]
     public async Task<IActionResult> ListarHorarios()
     {
-        return Ok( await dbContext.Horarios.OrderBy(p => p.Rank).ToListAsync());
+        return Ok(await dbContext.Horarios.OrderBy(p => p.Rank).ToListAsync());
     }
 }
