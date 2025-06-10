@@ -41,4 +41,5 @@ public class AmbienteController(AgendamentosDbContext dbContext) : ControllerBas
 
         return Created($"/ambientes/{ambienteNovo.Id}", ambienteNovo);
     }
+    
 }

@@ -66,8 +66,8 @@ public static class DependencyInjection
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(jwtOptions =>
             {
-                jwtOptions.Authority = "http://localhost:8080";
-                jwtOptions.Audience = "http://localhost:8080";
+                jwtOptions.Authority = Environment.GetEnvironmentVariable("HOST_DEFAULT_URL")!;
+                jwtOptions.Audience =  Environment.GetEnvironmentVariable("HOST_DEFAULT_URL")!;
                 jwtOptions.RequireHttpsMetadata = false;
                 jwtOptions.TokenValidationParameters = new TokenValidationParameters()
                 {
