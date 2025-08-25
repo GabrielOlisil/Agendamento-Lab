@@ -79,8 +79,8 @@ public static class DependencyInjection
                     ValidateIssuerSigningKey = true,
                     ClockSkew = TimeSpan.Zero,
 
-                    ValidIssuer = "http://localhost:8080",
-                    ValidAudience = "http://localhost:8080",
+                    ValidIssuer = Environment.GetEnvironmentVariable("HOST_DEFAULT_URL")!,
+                    ValidAudience = Environment.GetEnvironmentVariable("HOST_DEFAULT_URL")!,
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(configuration["Secrets:JwtKey"]!)
                     )

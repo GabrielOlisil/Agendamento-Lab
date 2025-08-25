@@ -1,0 +1,55 @@
+name: Build & Deploy API
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Clona o repositório
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Configura .NET
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x' # ajuste para sua versão
+
+      # Restaura pacotes
+      - name: Restore dependencies
+        run: dotnet restore ./Agendamentos.sln
+
+      # Compila
+      - name: Build
+        run: dotnet build ./Agendamentos.sln --configuration Release --no-restore
+
+      # Roda testes (se existir projeto de testes)
+      - name: Test
+        run: dotnet test ./Agendamentos.sln --no-build --verbosity normal
+
+      # Publica os binários (Release)
+      - name: Publish
+        run: dotnet publish ./Agendamentos/Agendamentos.csproj -c Release -o ./publish
+
+      # Prepara o pacote para o CapRover
+      - uses: a7ul/tar-action@v1.1.0
+        with:
+          command: c
+          cwd: "./"
+          files: |
+            publish/
+            Dockerfile
+            captain-definition
+          outPath: deploy.tar
+
+      # Faz o deploy no CapRover
+      - name: Deploy App to CapRover
+        uses: caprover/deploy-from-github@v1.0.1
+        with:
+          server: '${{ secrets.CAPROVER_SERVER }}'
+          app: '${{ secrets.APP_NAME }}'
+          token: '${{ secrets.APP_TOKEN }}'
