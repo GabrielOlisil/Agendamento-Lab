@@ -1,4 +1,5 @@
 using System.Text;
+using Agendamentos.Database;
 using Models;
 using Agendamentos.Helpers;
 using Agendamentos.Repositories;
@@ -6,6 +7,7 @@ using Agendamentos.Repositories.Interfaces;
 using Agendamentos.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Query.Expressions.Internal;
 
@@ -86,5 +88,35 @@ public static class DependencyInjection
             });
 
         return services;
+    }
+    
+    public static IServiceProvider ApplyMigrations(this IServiceProvider serviceProvider)
+    {
+        
+        using var scope = serviceProvider.CreateScope();
+
+
+        
+        var context = scope.ServiceProvider.GetRequiredService<AgendamentosDbContext>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>(); 
+
+
+        var pendingMigrations = context.Database.GetPendingMigrations();
+
+        var migrations = pendingMigrations as string[] ?? pendingMigrations.ToArray();
+        
+        if (migrations.Length != 0)
+        {
+            logger.LogInformation("Applying {Count} pending migrations...", migrations.Length);
+            context.Database.Migrate();
+            logger.LogInformation("Migrations applied successfully.");
+        }
+        else
+        {
+            logger.LogInformation("No pending migrations found.");
+        }
+        
+
+        return serviceProvider;
     }
 }

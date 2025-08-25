@@ -6,9 +6,7 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_URLS": "http://localhost:8080",
-        "HOST_DEFAULT_URL": "http://localhost:8080"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
   }

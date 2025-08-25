@@ -1,0 +1,31 @@
+# Ignore bin/obj build folders
+**/bin/
+**/obj/
+
+# Ignore user-specific project files
+*.user
+*.suo
+*.DotSettings.user
+*.swp
+
+# Ignore logs and temp files
+*.log
+*.tmp
+*.vs/
+.vscode/
+
+# Ignore secrets and local environment files
+.env
+*.local
+appsettings.Development.json
+
+# Ignore Dockerfile artifacts
+Dockerfile
+docker-compose*.yml
+
+# Ignore npm/node_modules if you have frontend parts
+node_modules/
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
