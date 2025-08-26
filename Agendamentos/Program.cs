@@ -19,7 +19,7 @@ builder.Services.AddDataProtection().UseCryptographicAlgorithms(new Authenticate
 var hostUrl = builder.Configuration["HOST_DEFAULT_URL"];
 if (string.IsNullOrEmpty(hostUrl))
 {
-    throw new InvalidOperationException("Configuration 'HOST_DEFAULT_URL' is required but was not found.");
+    throw new InvalidOperationException("Configuration 'HOST_DEFAULT_URL' is required");
 }
 
 const string myAllowSpecificOrigins = "frontentPolicy";
