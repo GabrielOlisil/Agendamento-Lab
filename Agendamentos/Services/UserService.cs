@@ -36,8 +36,8 @@ public class UserService(
         };
 
         var token = new JwtSecurityToken(
-            issuer: "http://localhost:8080",
-            audience: "http://localhost:8080",
+            issuer: Environment.GetEnvironmentVariable("HOST_DEFAULT_URL")!,
+            audience: Environment.GetEnvironmentVariable("HOST_DEFAULT_URL")!,
             claims: claims,
             expires: expires,
             signingCredentials: credentials
