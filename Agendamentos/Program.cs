@@ -16,7 +16,6 @@ builder.Services.AddDataProtection().UseCryptographicAlgorithms(new Authenticate
     ValidationAlgorithm = ValidationAlgorithm.HMACSHA512
 });
 
-Console.WriteLine($"Environment: {builder.Environment.EnvironmentName}");
 var hostUrl = builder.Configuration["HOST_DEFAULT_URL"];
 if (string.IsNullOrEmpty(hostUrl))
 {
