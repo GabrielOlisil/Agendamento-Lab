@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.Text;
 using Agendamentos.Database;
 using Microsoft.EntityFrameworkCore;
 using Models;
@@ -40,7 +41,7 @@ public class SessionService(AgendamentosDbContext context, ILogger<SessionServic
         
         
             var newAccessToken = UserService.GenerateAccessToken(displayName, session.User.Role, 
-                session.User.Id, DateTime.UtcNow.AddMinutes(1), configuration);
+                session.User.Id, DateTime.UtcNow.AddHours(1), configuration);
 
 
             await context.SaveChangesAsync();
@@ -66,7 +67,7 @@ public class SessionService(AgendamentosDbContext context, ILogger<SessionServic
         {
             User = user,
             CreatedAt = DateTime.UtcNow,
-            ExpiresAt = DateTime.UtcNow.AddDays(2),
+            ExpiresAt = DateTime.UtcNow.AddDays(3),
             Deleted = false,
             Id = Guid.NewGuid(),
             Revoked = false,
@@ -117,9 +118,20 @@ public class SessionService(AgendamentosDbContext context, ILogger<SessionServic
     
     public async Task CleanExpiredSessionsAsync()
     {
-        var expired = context.Sessions
-            .Where(s => s.ExpiresAt < DateTime.UtcNow || s.Revoked || s.Deleted);
-
+        var expired = await context.Sessions
+            .Where(s => s.ExpiresAt < DateTime.UtcNow || s.Revoked || s.Deleted).ToListAsync();
+        
+        if (expired.Count == 0)
+        {
+            logger.LogInformation("No expired sessions to clean.");
+            return;
+        }
+    
+        var sessionNames = string.Join(", ", expired.Select(s => s.Id));
+        
+        logger.LogInformation("Cleaning up {Count} expired/revoked/deleted sessions: {SessionIds}", 
+            sessionNames, expired.Count);
+        
         context.Sessions.RemoveRange(expired);
         await context.SaveChangesAsync();
     }

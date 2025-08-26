@@ -1,3 +1,4 @@
+using Agendamentos.BackgroundJobs;
 using Agendamentos.Database;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -6,6 +7,7 @@ using Agendamentos.Middleware;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
+using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +57,24 @@ builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.ConfigureSwagger();
 
 builder.Services.ConfigureAuth(builder.Configuration);
+
+builder.Services.AddQuartz(quartz =>
+{
+    var jobKey = new JobKey("SessionCleanup");
+    quartz.AddJob<SessionCleanup>(opts => opts.WithIdentity(jobKey));
+
+    quartz.AddTrigger(opts =>
+    {
+        opts.ForJob(jobKey)
+            .WithIdentity("SessionCleanup-trigger")
+            .StartNow()
+            .WithSimpleSchedule(x => x
+                .WithIntervalInHours(1)
+                .RepeatForever());
+    });
+
+});
+builder.Services.AddQuartzHostedService(opt => opt.WaitForJobsToComplete = true);
 
 
 var app = builder.Build();

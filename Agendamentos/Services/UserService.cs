@@ -123,7 +123,7 @@ public class UserService(
         if (refreshToken == null) return null;
         
         
-        var token = GenerateAccessToken(displayName, user.Role, user.Id, DateTime.UtcNow.AddMinutes(1), configuration);
+        var token = GenerateAccessToken(displayName, user.Role, user.Id, DateTime.UtcNow.AddHours(1), configuration);
         return (token, refreshToken);
     }
 }
