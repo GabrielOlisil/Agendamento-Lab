@@ -17,7 +17,7 @@ builder.Services.AddDataProtection().UseCryptographicAlgorithms(new Authenticate
 {
     EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
     ValidationAlgorithm = ValidationAlgorithm.HMACSHA512
-}).PersistKeysToFileSystem(new DirectoryInfo("App/DataProtectionKeys"));
+}).PersistKeysToFileSystem(new DirectoryInfo("/App/DataProtectionKeys"));
 
 var hostUrl = builder.Configuration["HOST_DEFAULT_URL"];
 if (string.IsNullOrEmpty(hostUrl))
