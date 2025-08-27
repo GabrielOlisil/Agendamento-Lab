@@ -114,7 +114,14 @@ app.UseRequestLogging();
 
 app.MapControllers();
 
+if (app.Environment.IsDevelopment())
+{
+    app.MapGet("/", () => Results.Redirect("/swagger/index.html")).ExcludeFromDescription();
+}
 
-app.Logger.LogInformation("Starting application at {HostUrl}/swagger/index.html", hostUrl);
+app.MapGet("up", () => Results.Ok(new { status = "up" }));
+
+
+app.Logger.LogInformation("Starting application at {HostUrl}", hostUrl);
 
 app.Run();
