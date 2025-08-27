@@ -8,8 +8,14 @@ public class SessionCleanup(SessionService sessionService, ILogger<SessionCleanu
 {
     public async Task Execute(IJobExecutionContext context)
     {
-        logger.LogInformation("Job {JobKey} started at {StartTime}", context.JobDetail.Key, DateTime.UtcNow);
+        logger.LogInformation("Job {JobKey} started at {StartTime}", 
+            context.JobDetail.Key, 
+            DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(-4)));
+        
         await sessionService.CleanExpiredSessionsAsync();
-        logger.LogInformation("Job {JobKey} finished at {EndTime}", context.JobDetail.Key, DateTime.UtcNow);
+        
+        logger.LogInformation("Job {JobKey} finished at {EndTime}", 
+            context.JobDetail.Key,
+            DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(-4)));
     }
 }

@@ -90,6 +90,10 @@ public static class DependencyInjection
         return services;
     }
     
+    
+    
+
+    
     public static IServiceProvider ApplyMigrations(this IServiceProvider serviceProvider)
     {
         

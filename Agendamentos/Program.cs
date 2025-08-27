@@ -3,6 +3,7 @@ using Agendamentos.Database;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Agendamentos.DependencyInjection;
+using Agendamentos.Helpers;
 using Agendamentos.Middleware;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
@@ -12,12 +13,18 @@ using Quartz;
 var builder = WebApplication.CreateBuilder(args);
 
 
-
-builder.Services.AddDataProtection().UseCryptographicAlgorithms(new AuthenticatedEncryptorConfiguration()
+if (ContainerHelpers.TryGetAppDirectoryFolder("/App/DataProtectionKeys", out var directory))
 {
-    EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
-    ValidationAlgorithm = ValidationAlgorithm.HMACSHA512
-}).PersistKeysToFileSystem(new DirectoryInfo("/App/DataProtectionKeys"));
+    builder.Services.AddDataProtection().UseCryptographicAlgorithms(new AuthenticatedEncryptorConfiguration()
+    {
+        EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
+        ValidationAlgorithm = ValidationAlgorithm.HMACSHA512
+    }).PersistKeysToFileSystem(directory);
+}
+
+
+
+
 
 var hostUrl = builder.Configuration["HOST_DEFAULT_URL"];
 if (string.IsNullOrEmpty(hostUrl))
