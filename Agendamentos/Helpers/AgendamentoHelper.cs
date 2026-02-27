@@ -62,12 +62,20 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
             }
         }
 
-
+        var lote = new Lote()
+        {
+            Id = Guid.NewGuid(),
+            Grupo = agendamentosPotenciais.ToList()
+        };
+        
         
         await using var transaction = await dbContext.Database.BeginTransactionAsync();
         try
         {
+            
+            
             await dbContext.Agendamentos.AddRangeAsync(agendamentosPotenciais);
+            await dbContext.Lotes.AddAsync(lote);
             await dbContext.SaveChangesAsync();
             await transaction.CommitAsync();
         }
