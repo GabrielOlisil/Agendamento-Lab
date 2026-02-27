@@ -21,9 +21,6 @@ public class UserService(
 {
     public static string GenerateAccessToken(string username, string role, Guid id, DateTime expiresAt, IConfiguration configuration)
     {
-
-        var expires = expiresAt;
-        
         var key = Encoding.UTF8.GetBytes(configuration["Secrets:JwtKey"]!);
         var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
 
@@ -39,7 +36,7 @@ public class UserService(
             issuer: Environment.GetEnvironmentVariable("HOST_DEFAULT_URL")!,
             audience: Environment.GetEnvironmentVariable("HOST_DEFAULT_URL")!,
             claims: claims,
-            expires: expires,
+            expires: expiresAt,
             signingCredentials: credentials
         );
 

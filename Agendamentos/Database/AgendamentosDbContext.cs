@@ -14,6 +14,9 @@ public class AgendamentosDbContext(IConfiguration configuration) : DbContext
     public DbSet<Professor> Professores { get; set; }
 
     public DbSet<Session> Sessions { get; set; }
+    
+    public DbSet<Lote> Lotes { get; set; }
+    
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseNpgsql(configuration["Database:ConnString"]);

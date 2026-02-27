@@ -32,14 +32,25 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
 
         var agendamentosPotenciais = new List<Agendamento>();
 
-        // Lista de pares (Data, HorarioId) para verificação de conflitos
-        var paresDataHorario = new List<(DateTime Data, Guid HorarioId)>();
 
-        for (int i = 0; i < dto.SemanasAReplicar; i++)
+        for (int i = 0; i <= dto.SemanasAReplicar; i++)
         {
             var dataDaSemana = dto.DataInicio.AddDays(i * 7);
             foreach (var horario in horariosParaAgendar)
             {
+                var conflito = await dbContext.Agendamentos
+                    .AnyAsync(a =>
+                        a.Data == dataDaSemana
+                        && a.Horario.Rank == horario.Rank
+                        && a.Ambiente.Id == dto.AmbienteId
+                    );
+
+                if (conflito)
+                {
+                    return (false, $"O horário {horario.Rank} do dia {dataDaSemana.Date} no laboratório {ambiente.Nome} já está ocupado");
+                }
+                
+
                 agendamentosPotenciais.Add(new Agendamento
                 {
                     Id = Guid.NewGuid(),
@@ -48,23 +59,11 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
                     Data = dataDaSemana.Date,
                     Horario = horario
                 });
-                paresDataHorario.Add((dataDaSemana.Date, horario.Id));
             }
         }
 
-        // 3. Verifica se algum dos horários já está ocupado (LINHA CORRIGIDA)
-        var conflitoEncontrado = await dbContext.Agendamentos
-            .Where(a => a.Ambiente.Id == dto.AmbienteId && !a.Deleted)
-            // Verifica se existe algum agendamento no banco cujo par (Data, HorarioId)
-            // corresponde a um dos pares que estamos tentando criar.
-            .AnyAsync(a => paresDataHorario.Any(p => p.Data == a.Data && p.HorarioId == a.Horario.Id));
 
-        if (conflitoEncontrado)
-        {
-            return (false, "Conflito detectado. Um ou mais horários neste período já estão agendados.");
-        }
-
-        // 4. Se não houver conflitos, cria todos os agendamentos dentro de uma transação
+        
         await using var transaction = await dbContext.Database.BeginTransactionAsync();
         try
         {
@@ -102,16 +101,16 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
             {
                 case Turno.Matutino:
                     aulas.Matutino.Add(new AgendamentoLabelResponseDto()
-                        { Rank = horario.Rank, Label = horario.Rank.ToString(), Status = false });
+                        { Rank = horario.Rank, Inicio = horario.Inicio.ToString(), Ocupado = false });
                     break;
                 case Turno.Verspertino:
                     aulas.Vespertino.Add(new AgendamentoLabelResponseDto()
-                        { Rank = horario.Rank, Label = horario.Rank.ToString(), Status = false });
+                        { Rank = horario.Rank, Inicio = horario.Inicio.ToString() , Ocupado = false });
 
                     break;
                 case Turno.Noturno:
                     aulas.Noturno.Add(new AgendamentoLabelResponseDto()
-                        { Rank = horario.Rank, Label = horario.Rank.ToString(), Status = false });
+                        { Rank = horario.Rank, Inicio = horario.Inicio.ToString(), Ocupado = false });
 
                     break;
             }
@@ -146,7 +145,7 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
                     }
 
                     hor.Label = ag.Professor.Nome;
-                    hor.Status = true;
+                    hor.Ocupado = true;
 
                     break;
 
@@ -159,7 +158,7 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
                     }
 
                     horVes.Label = ag.Professor.Nome;
-                    horVes.Status = true;
+                    horVes.Ocupado = true;
                     break;
 
                 case Turno.Noturno:
@@ -171,7 +170,7 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
                     }
 
                     horNot.Label = ag.Professor.Nome;
-                    horNot.Status = true;
+                    horNot.Ocupado = true;
                     break;
             }
         }

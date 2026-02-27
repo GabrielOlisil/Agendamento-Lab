@@ -68,7 +68,9 @@ builder.Services.ConfigureAuth(builder.Configuration);
 
 builder.Services.AddQuartz(quartz =>
 {
-    var jobKey = new JobKey("SessionCleanup");
+    const string jobName = "SessionCleanup";
+    
+    var jobKey = new JobKey(jobName);
     quartz.AddJob<SessionCleanup>(opts => opts.WithIdentity(jobKey));
 
     quartz.AddTrigger(opts =>

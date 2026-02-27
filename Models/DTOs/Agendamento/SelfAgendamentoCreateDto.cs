@@ -6,5 +6,5 @@ public record SelfAgendamentoCreateDto()
 
     public DateTime Data { get; set; }
 
-    public Guid HorarioId { get; set; }
+    public int HorarioRank { get; set; }
 }

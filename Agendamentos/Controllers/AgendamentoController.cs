@@ -72,7 +72,7 @@ public class AgendamentoController(
         var profId = user.Professor.Id;
 
         var disponibilidade = await dbContext.Agendamentos
-            .AnyAsync(p => p.Data.Date == agendamento.Data.Date && p.Horario.Id == agendamento.HorarioId && !p.Deleted);
+            .AnyAsync(p => p.Data.Date == agendamento.Data.Date && p.Horario.Rank == agendamento.HorarioRank && !p.Deleted);
 
         if (disponibilidade)
         {
@@ -80,7 +80,7 @@ public class AgendamentoController(
         }
 
         var ambiente = await dbContext.Ambientes.FindAsync(agendamento.AmbienteId);
-        var horario = await dbContext.Horarios.FindAsync(agendamento.HorarioId);
+        var horario = await dbContext.Horarios.FirstOrDefaultAsync(h => h.Rank == agendamento.HorarioRank);
 
         if (ambiente is null || horario is null)
             return BadRequest("Ambiente ou horário inválido.");

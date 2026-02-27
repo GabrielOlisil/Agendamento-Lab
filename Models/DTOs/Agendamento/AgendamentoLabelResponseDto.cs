@@ -4,5 +4,6 @@ public record AgendamentoLabelResponseDto()
 {
     public int Rank { get; set; }
     public string Label { get; set; } = string.Empty;
-    public bool Status { get; set; } = false;
+    public string Inicio { get; set; } = string.Empty;
+    public bool Ocupado { get; set; } = false;
 }
