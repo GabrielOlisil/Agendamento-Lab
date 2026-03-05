@@ -94,7 +94,7 @@ public class SessionService(AgendamentosDbContext context, ILogger<SessionServic
     }
     
     
-    public string? CreateSessionInContext(User user, AgendamentosDbContext dbContext)
+    private string? CreateSessionInContext(User user, AgendamentosDbContext dbContext)
     {
         try
         {

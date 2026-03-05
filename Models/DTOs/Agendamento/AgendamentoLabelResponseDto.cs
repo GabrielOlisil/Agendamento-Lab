@@ -6,4 +6,6 @@ public record AgendamentoLabelResponseDto()
     public string Label { get; set; } = string.Empty;
     public string Inicio { get; set; } = string.Empty;
     public bool Ocupado { get; set; } = false;
+    
+    public Guid? Agendamento {get; set;}
 }

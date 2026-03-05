@@ -6,11 +6,25 @@ namespace Agendamentos.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class UserController(UserService userService, SessionService sessionService) : ControllerBase
+public class UserController(UserService userService, SessionService sessionService, ILogger<UserController> logger) : ControllerBase
 {
     [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh(string refreshToken)
+    public async Task<IActionResult> Refresh()
     {
+        
+        if (!Request.Cookies.ContainsKey("SessionToken"))
+        {
+            return Unauthorized("Não foi possível renovar o token.");
+
+        }
+
+        var refreshToken = Request.Cookies["SessionToken"];
+        
+        
+        logger.LogInformation("Token: {0}",Request.Cookies["SessionToken"]);
+        
+        
+        
         if (string.IsNullOrWhiteSpace(refreshToken))
         {
             return BadRequest("Refresh token é obrigatório.");
@@ -23,11 +37,18 @@ public class UserController(UserService userService, SessionService sessionServi
         {
             return Unauthorized("Não foi possível renovar o token.");
         }
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true, // Prevents client-side scripts from accessing the cookie
+            SameSite = SameSiteMode.Strict, 
+            Expires = DateTimeOffset.UtcNow.AddMinutes(30) // Set an appropriate expiration
+        };  
+        Response.Cookies.Append("SessionToken", token.Value.refreshToken, cookieOptions);
+
         
         return Ok(new
         {
             accessToken = token.Value.accessToken,
-            refreshToken = token.Value.refreshToken
         });
         
     }
@@ -52,17 +73,27 @@ public class UserController(UserService userService, SessionService sessionServi
         var token = await userService.Login(userDto);
 
         if (!token.HasValue) return Unauthorized("Usuário ou senha inválidos.");
-
         
         
 
-        return Ok(new { token.Value.token, token.Value.refreshToken });
+        
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true, // Prevents client-side scripts from accessing the cookie
+            SameSite = SameSiteMode.Strict, 
+            Expires = DateTimeOffset.UtcNow.AddMinutes(30) // Set an appropriate expiration
+        };
+        Response.Cookies.Append("SessionToken", token.Value.refreshToken, cookieOptions);
+
+        return Ok(new { token.Value.token });
 
     }
     
     [HttpPost("loginprof")]
     public async Task<IActionResult> LoginProfessor(LoginProfesorDto userDto)
     {
+        
+        
         var login = new LoginDto()
         {
             PassWord = "changeme",
@@ -75,8 +106,16 @@ public class UserController(UserService userService, SessionService sessionServi
         {
             return Unauthorized("Usuário ou senha inválidos.");
         }
+        
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true, 
+            SameSite = SameSiteMode.Strict, 
+            Expires = DateTimeOffset.UtcNow.AddMinutes(30) 
+        };  
+        Response.Cookies.Append("SessionToken", token.Value.refreshToken, cookieOptions);
 
-        return Ok(new { token.Value.token, token.Value.refreshToken });
+        return Ok(new { token.Value.token });
 
     }
 }

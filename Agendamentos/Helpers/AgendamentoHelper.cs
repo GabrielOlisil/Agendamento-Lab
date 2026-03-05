@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Agendamentos.Helpers;
 
-public class AgendamentoHelper(AgendamentosDbContext dbContext)
+public class AgendamentoHelper(AgendamentosDbContext dbContext, ILogger<AgendamentoHelper> logger)
 {
     public async Task<(bool Sucesso, string Mensagem)> CriarAgendamentosEmLote(AgendamentoLoteCreateDto dto)
     {
@@ -109,7 +109,7 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
             {
                 case Turno.Matutino:
                     aulas.Matutino.Add(new AgendamentoLabelResponseDto()
-                        { Rank = horario.Rank, Inicio = horario.Inicio.ToString(), Ocupado = false });
+                        { Rank = horario.Rank, Inicio = horario.Inicio.ToString(), Ocupado = false});
                     break;
                 case Turno.Verspertino:
                     aulas.Vespertino.Add(new AgendamentoLabelResponseDto()
@@ -129,8 +129,9 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
             .Include(e => e.Horario)
             .Include(e => e.Ambiente)
             .Include(p => p.Professor)
+            .Include(l => l.Lote)
             .Where(p => p.Ambiente.Slug == slug)
-            .Where(e => e.Data.Date == dia.Date)
+            .Where(e => e.Data.Date == dia.Date && !e.Deleted)
             .OrderBy(p => p.Horario.Rank)
             .ToListAsync();
 
@@ -154,7 +155,8 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
 
                     hor.Label = ag.Professor.Nome;
                     hor.Ocupado = true;
-
+                    hor.Agendamento = ag.Id;
+                    
                     break;
 
                 case Turno.Verspertino:
@@ -167,6 +169,8 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
 
                     horVes.Label = ag.Professor.Nome;
                     horVes.Ocupado = true;
+                    horVes.Agendamento = ag.Id;
+
                     break;
 
                 case Turno.Noturno:
@@ -179,6 +183,8 @@ public class AgendamentoHelper(AgendamentosDbContext dbContext)
 
                     horNot.Label = ag.Professor.Nome;
                     horNot.Ocupado = true;
+                    horNot.Agendamento = ag.Id;
+
                     break;
             }
         }

@@ -7,5 +7,4 @@ public class Horario : AppModelBase
     public int Rank { get; set; }
     public Turno Turno { get; set; }
     
-    public Lote? Lote { get; set; }
 }

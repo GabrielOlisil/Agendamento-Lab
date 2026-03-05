@@ -28,6 +28,7 @@ public class AgendamentoController(
             .Include(e => e.Ambiente)
             .Include(e => e.Horario)
             .Include(p => p.Professor)
+            .Include(p => p.Lote)
             .Where(p => !p.Deleted)
             .ToListAsync());
     }
@@ -40,6 +41,7 @@ public class AgendamentoController(
             .Include(e => e.Ambiente)
             .Include(e => e.Horario)
             .Include(p => p.Professor)
+            .Include(a => a.Lote)
             .FirstOrDefaultAsync(p => p.Id == id && !p.Deleted);
 
         if (agendamento == null)
@@ -69,10 +71,9 @@ public class AgendamentoController(
             return Forbid();
         }
 
-        var profId = user.Professor.Id;
 
         var disponibilidade = await dbContext.Agendamentos
-            .AnyAsync(p => p.Data.Date == agendamento.Data.Date && p.Horario.Rank == agendamento.HorarioRank && !p.Deleted);
+            .AnyAsync(p => p.Data.Date == agendamento.Data.Date && p.Horario.Id == agendamento.HorarioId && !p.Deleted);
 
         if (disponibilidade)
         {
@@ -80,7 +81,7 @@ public class AgendamentoController(
         }
 
         var ambiente = await dbContext.Ambientes.FindAsync(agendamento.AmbienteId);
-        var horario = await dbContext.Horarios.FirstOrDefaultAsync(h => h.Rank == agendamento.HorarioRank);
+        var horario = await dbContext.Horarios.FirstOrDefaultAsync(h => h.Id == agendamento.HorarioId);
 
         if (ambiente is null || horario is null)
             return BadRequest("Ambiente ou horário inválido.");
@@ -276,15 +277,35 @@ public class AgendamentoController(
 
     [HttpDelete("{id}")]
     [Authorize(Roles = "admin")]
-    public async Task<IActionResult> DeleteAgendamento(Guid id)
+    public async Task<IActionResult> DeleteAgendamento(Guid id, bool deleteLote)
     {
-        var agendamento = await dbContext.Agendamentos.FindAsync(id);
+        var agendamento = await dbContext.Agendamentos.Include(a => a.Lote)
+            .Where(a => a.Id == id && !a.Deleted)
+            .FirstOrDefaultAsync();
+
+
         if (agendamento == null)
         {
             return NotFound();
         }
 
-        agendamento.Deleted = true; // Soft delete
+        if (deleteLote && agendamento.Lote is not null)
+        {
+            try
+            {
+                await dbContext.Agendamentos
+                    .Where(a => a.Deleted == false && a.Lote != null && a.Lote.Id == agendamento.Lote.Id)
+                    .ExecuteUpdateAsync(s => s.SetProperty(p => p.Deleted, true));
+            }
+            catch (Exception e)
+            {
+                return NoContent();
+            }
+           
+
+        }
+
+        agendamento.Deleted = true;
         await dbContext.SaveChangesAsync();
 
         return NoContent();

@@ -9,4 +9,7 @@ public class Agendamento : AppModelBase
     public Horario Horario { get; set; }
 
     public Professor Professor { get; set; }
+    
+    public Lote? Lote { get; set; }
+
 }

@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Agendamentos.BackgroundJobs;
 using Agendamentos.Database;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -58,12 +59,13 @@ builder.Services.AddAuthorizationBuilder()
 
 
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(x =>
+    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 
 builder.Services.ConfigureSwagger();
-
+    
 builder.Services.ConfigureAuth(builder.Configuration);
 
 builder.Services.AddQuartz(quartz =>
