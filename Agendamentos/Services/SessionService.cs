@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using Agendamentos.Database;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models;
 
@@ -118,22 +119,17 @@ public class SessionService(AgendamentosDbContext context, ILogger<SessionServic
     
     public async Task CleanExpiredSessionsAsync()
     {
-        var expired = await context.Sessions
-            .Where(s => s.ExpiresAt < DateTime.UtcNow || s.Revoked || s.Deleted).ToListAsync();
-        
-        if (expired.Count == 0)
+        var affected = await context.Sessions
+            .Where(s => s.ExpiresAt < DateTime.UtcNow || s.Revoked)
+            .ExecuteUpdateAsync(s => s.SetProperty(p => p.Deleted, true) );
+
+        if (affected > 0)
         {
-            logger.LogInformation("No expired sessions to clean.");
+            logger.LogInformation("Nenhuma sessão foi alterada");
             return;
         }
-    
-        var sessionNames = string.Join(", ", expired.Select(s => s.Id));
-        
-        logger.LogInformation("Cleaning up {Count} expired/revoked/deleted sessions: {SessionIds}", 
-            sessionNames, expired.Count);
-        
-        context.Sessions.RemoveRange(expired);
-        await context.SaveChangesAsync();
+      
+        logger.LogInformation("Cleaned {Count} expired/revoked sessions.", affected);
     }
     
     public string GenerateRefreshToken()
@@ -150,6 +146,24 @@ public class SessionService(AgendamentosDbContext context, ILogger<SessionServic
         return await context.Sessions
             .Include(s => s.User)
             .FirstOrDefaultAsync(s => s.RefreshToken == refreshToken);
+    }
+
+
+    public async Task<bool> LogOut(Session session)
+    {
+
+        try
+        {
+            session.Revoked = true;
+            context.Sessions.Update(session);
+            await context.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("Erro ao terminar Sessão");
+            return false;
+        }
     }
     
     

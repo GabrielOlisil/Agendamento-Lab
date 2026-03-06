@@ -8,6 +8,8 @@ namespace Agendamentos.Controllers;
 [Route("[controller]")]
 public class UserController(UserService userService, SessionService sessionService, ILogger<UserController> logger) : ControllerBase
 {
+    private const string SessionTokenKey = "SessionToken";
+    
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh()
     {
@@ -18,10 +20,10 @@ public class UserController(UserService userService, SessionService sessionServi
 
         }
 
-        var refreshToken = Request.Cookies["SessionToken"];
+        var refreshToken = Request.Cookies[SessionTokenKey];
         
         
-        logger.LogInformation("Token: {0}",Request.Cookies["SessionToken"]);
+        logger.LogInformation("Token: {0}",Request.Cookies[SessionTokenKey]);
         
         
         
@@ -43,7 +45,7 @@ public class UserController(UserService userService, SessionService sessionServi
             SameSite = SameSiteMode.Strict, 
             Expires = DateTimeOffset.UtcNow.AddMinutes(30) // Set an appropriate expiration
         };  
-        Response.Cookies.Append("SessionToken", token.Value.refreshToken, cookieOptions);
+        Response.Cookies.Append(SessionTokenKey, token.Value.refreshToken, cookieOptions);
 
         
         return Ok(new
@@ -83,7 +85,7 @@ public class UserController(UserService userService, SessionService sessionServi
             SameSite = SameSiteMode.Strict, 
             Expires = DateTimeOffset.UtcNow.AddMinutes(30) // Set an appropriate expiration
         };
-        Response.Cookies.Append("SessionToken", token.Value.refreshToken, cookieOptions);
+        Response.Cookies.Append(SessionTokenKey, token.Value.refreshToken, cookieOptions);
 
         return Ok(new { token.Value.token });
 
@@ -113,9 +115,47 @@ public class UserController(UserService userService, SessionService sessionServi
             SameSite = SameSiteMode.Strict, 
             Expires = DateTimeOffset.UtcNow.AddMinutes(30) 
         };  
-        Response.Cookies.Append("SessionToken", token.Value.refreshToken, cookieOptions);
+        Response.Cookies.Append(SessionTokenKey, token.Value.refreshToken, cookieOptions);
 
         return Ok(new { token.Value.token });
+
+    }
+
+    [HttpPost("logout")]
+    
+    public async Task<IActionResult> LogOut()
+    {
+        
+        var sessionToken = Request.Cookies[SessionTokenKey];
+
+
+        if (sessionToken is null)
+        {
+            return BadRequest("Não existe token de sessão válido na requisição");
+        }
+
+
+        var session = await sessionService.GetSessionByRefreshTokenAsync(sessionToken);
+
+        if (session is null)
+        {
+            return BadRequest("Não existe token de sessão válido na requisição");
+
+        }
+
+        session.Revoked = true;
+
+
+        if (!await sessionService.LogOut(session)) return BadRequest("Erro ao finalizar sessão");
+        
+        
+        Response.Cookies.Delete(SessionTokenKey);
+        logger.LogInformation("Sessão removida com sucesso.");
+        return Ok("Sessão Removida");
+
+
+
+
 
     }
 }
