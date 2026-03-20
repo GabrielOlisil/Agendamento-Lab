@@ -14,7 +14,7 @@ public class AmbienteController(AgendamentosDbContext dbContext) : ControllerBas
 {
 
     [HttpGet]
-    [AllowAnonymous] // Qualquer um pode listar os ambientes
+    [AllowAnonymous] 
     public async Task<IActionResult> ListarAmbientes()
     {
         var ambientes = await dbContext.Ambientes.Where(p => !p.Deleted).ToListAsync();
@@ -26,6 +26,18 @@ public class AmbienteController(AgendamentosDbContext dbContext) : ControllerBas
     public async Task<IActionResult> GetAmbiente(Guid id)
     {
         var ambiente = await dbContext.Ambientes.FirstOrDefaultAsync(p => p.Id == id && !p.Deleted);
+        if (ambiente == null)
+        {
+            return NotFound();
+        }
+        return Ok(ambiente);
+    }
+    
+    [HttpGet("slug/{slug}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAmbienteWithSlug(string slug)
+    {
+        var ambiente = await dbContext.Ambientes.FirstOrDefaultAsync(p => p.Slug == slug && !p.Deleted);
         if (ambiente == null)
         {
             return NotFound();
